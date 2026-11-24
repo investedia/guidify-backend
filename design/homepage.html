@@ -58,12 +58,12 @@ function sample(cx,cy,size,cols,rows,ox,oy,step){ // alpha of big logo at each c
   g.drawImage(big,(cx-size/2-ox)/step,(cy-size/2-oy)/step,size/step,size/step);return g.getImageData(0,0,cols,rows).data}
 function build(){if(!big.complete)return;const d=Math.min(devicePixelRatio||1,2);W=cv.clientWidth;H=cv.clientHeight;cv.width=W*d;cv.height=H*d;x.setTransform(d,0,0,d,0,0);
   const narrow=W<700;
-  const L={a:narrow?[W*.5,H*.24,W*.62]:[W*.72,H*.5,Math.min(H*.74,W*.44)],b:[W*.8,H*.42,H*1.15],c:[W*.5,H*.4,Math.min(H*.62,W*.7)],d:null};
+  const L={a:narrow?[W*.78,H*.26,Math.min(W*1.15,H*.5)]:[W*.72,H*.5,Math.min(H*.74,W*.44)],b:[W*.8,H*.42,H*1.15],c:[W*.5,H*.4,Math.min(H*.62,W*.7)],d:null};
   const [cx,cy,size]=L[v]||L.a;
   const cols=Math.ceil(W/G)+1,rows=Math.ceil(H/G)+1,al=sample(cx,cy,size,cols,rows,G/2,G/2,G);
   cells=[];for(let j=0;j<rows;j++)for(let i=0;i<cols;i++){const px=i*G+G/2,py=j*G+G/2,k=al[(j*cols+i)*4+3]/255;
     const halo=Math.max(0,1-Math.hypot(px-cx,py-cy)/(size*.95));
-    const on=k>.45,r=Math.random();const top=narrow&&py>H*.38;
+    const on=k>.45,r=Math.random();const top=narrow&&py>H*.5;
     let b=on?.26+.14*r:(r<.35+halo*.4?.02+.06*halo*Math.random():0);
     if(v!=='b'&&!narrow&&px<W*.45&&!on)b*=.35; // calmer behind the copy
     if(py<80)b*=.25;if(top)b*=.4; // keep the nav clean
@@ -77,7 +77,7 @@ function frame(t){mx+=(tx-mx)*.08;my+=(ty-my)*.08;x.clearRect(0,0,W,H);
 const ready=()=>{if(sm.complete&&big.complete){tint.w=mk('#fff');tint.k=mk('#000');build()}};
 sm.onload=big.onload=ready;
 const hero=document.querySelector('.hero');
-hero.addEventListener('pointermove',e=>{const b=cv.getBoundingClientRect();tx=e.clientX-b.left;ty=e.clientY-b.top});
+hero.addEventListener('pointermove',e=>{if(e.pointerType!=="mouse")return;const b=cv.getBoundingClientRect();tx=e.clientX-b.left;ty=e.clientY-b.top});
 hero.addEventListener('pointerleave',()=>{tx=ty=-1e4});
 const ro=new ResizeObserver(build);ro.observe(cv);
 requestAnimationFrame(frame);
